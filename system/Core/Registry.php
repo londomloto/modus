@@ -1,11 +1,12 @@
 <?php
 namespace Sys\Core;
 
-class Registry implements \Iterator {
-    
+class Registry extends Component implements \Iterator {
+
     protected $_data;
 
-    public function __construct() {
+    public function __construct(\Sys\Core\IApplication $app) {
+        parent::__construct($app);
         $this->_data = array();
     }
 
@@ -40,5 +41,4 @@ class Registry implements \Iterator {
     public function valid() {
         return key($this->_data) !== NULL;
     }
-
 }

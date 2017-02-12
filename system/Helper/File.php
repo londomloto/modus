@@ -8,11 +8,25 @@ class File {
         return $ext;
     }
 
+    public static function getExtensionFromType($type) {
+        $maps = array(
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/x-png' => 'png'
+        );
+
+        return isset($maps[$type]) ? $maps[$type] : 'application/octet-stream';
+    }
+
     public static function getType($file) {
         $info = new \finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($file);
+        $mime = $info->file($file);
         $info = NULL;
         return $mime;
+    }
+
+    public function delete($file) {
+        return @unlink($file);
     }
 
 }

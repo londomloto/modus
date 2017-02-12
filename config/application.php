@@ -14,68 +14,52 @@ return array(
 
     'author' => 'Roso Sasongko <roso.sasongko@gmail.com>',  
 
-    /**
-     * Nama file index: index.php
-     */
+    'locale' => 'id_ID',
+
     'index' => '',
 
-    /**
-     * Default path
-     */
-    'default' => 'user',
-
-    /**
-     * Ekstensi url
-     */
-    'suffix' => '.jsp',
+    'default' => 'site',
 
     'charset' => 'UTF-8',
 
-    /**
-     * Daftar karakter yang diperbolehkan dalam URL
-     */
-    'urlchars' => 'a-z 0-9~%.:_\-',
+    'urlchars' => 'a-z 0-9~%.:_\-@',
 
-    /**
-     * Session config
-     */
     'session' => array(
-        'name' => 'easyflow',
+        'name' => 'EASYSESSID',
         'cookie_lifetime' => 86400,
-        'cookie_path' => '/'
+        // 'cookie_lifetime' => 1440,
+        'cookie_path' => '/',
     ),
 
-    /**
-     * Security setting
-     */
     'security' => array(
-        'secret_key' => 'dM0m8TVFtwxcKiMFJ2hA2o+eo7RH2kr7amiLsIOQxVJ+S29VtWjzS1M7mUlR8dtNyuwFNMOAC6+LZtv7c2PhJg=='
+        'secret_key' => 'Lv4dmEWEWAjEyLaJkXz+BGvypPYcH/aSO3LMOCloAuM=',
     ),
 
-    /**
-     * Authentication
-     */
+    'setting' => array(
+        'source' => 'setting',
+    ),
+    
     'auth' => array(
-        'user_table' => 'user',
-        'role_table' => 'role',
-        'locking' => TRUE,
-        'max_attempts' => 3,
-        'timeout' => 120
+        'source' => 'user',
     ),
 
-    /**
-     * Database read/write
-     */
-    'database' => array(
-        'read' => 'db',
-        'write' => 'db'
+    'role' => array(
+        'source' => 'role'
     ),
-
-    /**
-     * Daftar service yang otomatis diload ketika aplikasi dimulai
-     */
+    
     'services' => array(
-        
-    )
+        'setting' => 'App\Service\Setting',
+        'site' => 'App\Service\Site',
+        'auth' => 'App\Service\Auth',
+        'role' => 'App\Service\Role',
+        'notification' => 'App\Service\Notification',
+    ),
+
+    'plugins' => array(
+        'module' => 'App\Plugin\Module',
+        'database' => 'App\Plugin\Database',
+        'dispatcher' => 'App\Plugin\Dispatcher',
+        'application' => 'App\Plugin\Application',
+    ),
     
 );

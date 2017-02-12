@@ -1,0 +1,309 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the easyflow package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: easyflow 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-05 18:06+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: application/Module/Access/Access.php:56 application/Module/User/User.php:98
+msgid "Data already exists!"
+msgstr ""
+
+#: application/Module/Access/Access.php:106
+msgid "Unable to delete data"
+msgstr ""
+
+#: application/Module/Access/Access.php:109
+#: application/Module/User/User.php:172
+msgid "No data to delete"
+msgstr ""
+
+#: application/Module/Auth/Auth.php:21
+msgid "User have never logged in"
+msgstr ""
+
+#: application/Module/Auth/Auth.php:46 application/Module/Auth/Auth.php:79
+#: application/Module/Auth/Auth.php:154 application/Module/User/User.php:226
+#: application/Module/User/User.php:346 application/Module/User/User.php:364
+msgid "Invalid parameters"
+msgstr ""
+
+#: application/Module/Auth/Auth.php:119
+#, php-format
+msgid "%s, welcome to %s"
+msgstr ""
+
+#: application/Module/Diagram/Diagram.php:76
+msgid "You don't have permission to update diagram"
+msgstr ""
+
+#: application/Module/Mail/Inbox.php:72 application/Module/User/User.php:294
+msgid "Invalid application context"
+msgstr ""
+
+#: application/Module/Mail/Mail.php:15
+#, php-format
+msgid "Criticisms and suggestions from %s"
+msgstr ""
+
+#: application/Module/Mail/Mail.php:19
+msgid "An error ocurred while sending message"
+msgstr ""
+
+#: application/Module/Setting/Setting.php:47
+msgid "You don't have permission to update application settings"
+msgstr ""
+
+#: application/Module/Tutorial/Tutorial.php:103
+msgid "Failed to delete tutorial"
+msgstr ""
+
+#: application/Module/User/User.php:165
+msgid "Unable to delete admin account"
+msgstr ""
+
+#: application/Module/User/User.php:282
+msgid "Password reset request"
+msgstr ""
+
+#: application/Module/User/User.php:291
+msgid "The email you entered doesn't match the registration info"
+msgstr ""
+
+#: application/Module/User/User.php:338
+msgid "Password recovery"
+msgstr ""
+
+#: application/Module/User/User.php:343
+msgid "The email address is not registered"
+msgstr ""
+
+#: application/Plugin/Dispatcher.php:24
+msgid "Your session has been expired!"
+msgstr ""
+
+#: application/Service/Auth.php:80
+msgid "You don't have permission to access this application"
+msgstr ""
+
+#: application/Service/Auth.php:83 application/Service/Auth.php:86
+msgid "Invalid email or password"
+msgstr ""
+
+#: application/Service/Auth.php:121
+msgid "This email address is not available"
+msgstr ""
+
+#: application/Service/Auth.php:137
+msgid "An error occurred while creating account"
+msgstr ""
+
+#: application/Service/Role.php:178
+msgid "You don't have permission to perform this action"
+msgstr ""
+
+#: cache/template/bc/bcc1fe38e9c214577e1cd9dcdfe95130af20be338cf0a50b61eb11c8c4b1e149.php:22
+msgid "Hello world"
+msgstr ""
+
+#: config/permission.php:6
+msgid "Access backend application menu"
+msgstr ""
+
+#: config/permission.php:10
+msgid "Add user"
+msgstr ""
+
+#: config/permission.php:14
+msgid "Delete tutorial"
+msgstr ""
+
+#: config/permission.php:18
+msgid "Add tutorial"
+msgstr ""
+
+#: config/permission.php:22
+msgid "Edit user"
+msgstr ""
+
+#: config/permission.php:26
+msgid "Delete user"
+msgstr ""
+
+#: config/permission.php:30
+msgid "Edit account"
+msgstr ""
+
+#: config/permission.php:34
+msgid "Delete account"
+msgstr ""
+
+#: config/permission.php:38
+msgid "Access backend access menu"
+msgstr ""
+
+#: config/permission.php:42
+msgid "Login to frontend"
+msgstr ""
+
+#: config/permission.php:46
+msgid "Login to backend"
+msgstr ""
+
+#: config/permission.php:50
+msgid "Access backend user menu"
+msgstr ""
+
+#: config/permission.php:54
+msgid "Edit application setting"
+msgstr ""
+
+#: config/permission.php:58
+msgid "Edit access data"
+msgstr ""
+
+#: config/permission.php:62
+msgid "Add access data"
+msgstr ""
+
+#: system/Core/Application.php:47
+#, php-format
+msgid "Service '%s' not found"
+msgstr ""
+
+#: system/Core/Application.php:51 system/Core/Component.php:41
+#, php-format
+msgid "Call to undefined method or service '%s'"
+msgstr ""
+
+#: system/Core/Application.php:339
+#, php-format
+msgid "Service %s doesn't found!"
+msgstr ""
+
+#: system/Core/Application.php:364
+#, php-format
+msgid "Module %s doesn't found!"
+msgstr ""
+
+#: system/Core/Application.php:408
+#, php-format
+msgid "Path %s doesn't found"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:35
+msgid "Fatal error"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:38
+msgid "Error"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:43
+msgid "Warning"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:46
+msgid "Notify"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:48
+msgid "Debug"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:50
+msgid "Deprecated"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:52
+msgid "Unknown error"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:71
+msgid "Unsupported resource"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:72
+msgid "Access denied"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:73
+msgid "Access not allowed"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:74
+msgid "Resource not found"
+msgstr ""
+
+#: system/Core/ErrorHandler.php:75
+msgid "Internal server error"
+msgstr ""
+
+#: system/Core/EventBus.php:16
+msgid "Event handler must be an Object"
+msgstr ""
+
+#: system/Core/EventBus.php:34
+#, php-format
+msgid "Invalid event type '%s'"
+msgstr ""
+
+#: system/Core/EventBus.php:68
+msgid "The queue is not valid"
+msgstr ""
+
+#: system/Core/EventObject.php:22
+msgid "Trying to cancel a non-cancelable event"
+msgstr ""
+
+#: system/Core/Service.php:85
+#, php-format
+msgid "Service '%s' not found!"
+msgstr ""
+
+#: system/Db/Mysql.php:80
+msgid "Database not connected"
+msgstr ""
+
+#: system/Db/Mysql.php:250
+msgid "Bulk update: missing data"
+msgstr ""
+
+#: system/Db/Mysql.php:255
+msgid "Bulk update: missing index"
+msgstr ""
+
+#: system/Service/Dispatcher.php:31
+#, php-format
+msgid "Method %s->%s() doesn't exists!"
+msgstr ""
+
+#: system/Service/Dispatcher.php:92
+#, php-format
+msgid "Call to undefined method %s::%s()"
+msgstr ""
+
+#: system/Service/Dispatcher.php:107
+#, php-format
+msgid "Missing required parameter '%s' for method %s::%s()"
+msgstr ""
+
+#: system/Service/Security.php:361
+msgid "Access token is not ready yet"
+msgstr ""
+
+#: system/Service/Security.php:364
+msgid "Access token has been expired"
+msgstr ""

@@ -3,43 +3,84 @@ namespace Sys\Core;
 
 class Session extends Component {
 
-    protected $_started;
     protected $_config;
     protected $_elapsed;
 
-    public function __construct(IApplication $app) {
+    public function __construct(\Sys\Core\IApplication $app) {
         parent::__construct($app);
-        $this->_started = FALSE;
-        $this->_config = $this->getAppConfig()->application->session->toArray();
+        $this->_config  = $app->getConfig()->application->session;
     }
 
-    public function has($name) {
-        return isset($_SESSION[$name]);
+    public function isStarted() {
+        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            return session_status() != PHP_SESSION_NONE;
+        } else {
+            return session_id() != '';
+        }
     }
 
-    public function set($name, $value) {
-        $_SESSION[$name] = $value;
+    public function id($id = NULL) {
+        if (is_null($id)) {
+            return session_id();
+        }
+
+        session_id($id);
+        return $id;
     }
 
-    public function get($name) {
-        return $this->has($name) ? $_SESSION[$name] : FALSE;
+    public function name() {
+        return session_name();
     }
 
-    public function remove($name) {
-        unset($_SESSION[$name]);
+    public function has($key) {
+        return isset($_SESSION[$key]);
     }
 
-    public function start() {
+    public function set($key, $value = NULL) {
+        if (is_array($key)) {
+            foreach($key as $k => $v) {
+                $_SESSION[$k] = $v;
+            }
+        } else {
+            $_SESSION[$key] = $value;
+        }
+        // session_write_close();
+    }
 
-        if ($this->_started) {
-            return;
+    public function get($key) {
+        return $this->has($key) ? $_SESSION[$key] : FALSE;
+    }
+
+    public function remove($key) {
+        unset($_SESSION[$key]);
+    }
+
+    public function close() {
+        session_write_close();
+    }
+
+    public function start($name = NULL, $path = NULL) {
+
+        $started = $this->isStarted();
+        
+        if ($started) {
+            $this->close();
+            $this->destroy();
         }
 
         $config = $this->_config;
-        $secure = $this->getService('uri')->isSecure();
-        
-        session_name($config['name']);
-        
+        $secure = $this->getUrl()->isSecure();
+
+        if (is_null($name)) {
+            $name = $config->name;
+        }
+
+        if (is_null($path)) {
+            $path = $config->cookie_path;
+        }
+
+        session_name($name);
+
         // setcookie(
         //     session_name(),
         //     session_id(),
@@ -51,24 +92,27 @@ class Session extends Component {
         // );
 
         session_set_cookie_params(
-            $config['cookie_lifetime'],
-            $config['cookie_path'],
+            $config->cookie_lifetime,
+            $path,
             NULL,
             $secure,
             TRUE
         );
 
         session_start();
-        
-        $this->_started = TRUE;
-        
+
         if ($this->isValid()) {
             if ( ! $this->isSafe()) {
                 $_SESSION = array();
-                $_SESSION['IPADDRESS'] = isset($_SERVER['HTTP_X_FORWARDED_FOR'])
-                        ? $_SERVER['HTTP_X_FORWARDED_FOR'] 
-                        : $_SERVER['REMOTE_ADDR'];
-                $_SESSION['USERAGENT'] = $_SERVER['HTTP_USER_AGENT'];
+                $time = time();
+
+                $this->set(array(
+                    'IPADDRESS' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
+                    'USERAGENT' => $_SERVER['HTTP_USER_AGENT'],
+                    'STARTDATE' => $time,
+                    'STOPDATE'  => $time + $config->cookie_lifetime
+                ));
+
                 $this->regenerate();
             } else if (rand(1, 100) <= 5) {
                 $this->regenerate();
@@ -77,15 +121,25 @@ class Session extends Component {
             $_SESSION = array();
             session_destroy();
             session_start();
-            $this->_started = TRUE;
         }
+    }
 
+    public function info() {
+        $start = isset($_SESSION['STARTDATE']) ? $_SESSION['STARTDATE'] : time();
+        $stop  = isset($_SESSION['STOPDATE']) ? $_SESSION['STOPDATE'] : $start;
+
+        $info = array(
+            'session_name' => session_name(),
+            'session_start' => date('Y-m-d H:i:s', $start),
+            'session_expired' => date('Y-m-d H:i:s', $stop)
+        );
         
+        return $info;
     }
 
     public function destroy() {
         $params = session_get_cookie_params();
-
+        
         setcookie(
             session_name(), 
             '', 
@@ -98,10 +152,8 @@ class Session extends Component {
 
         $_SESSION = array();
         session_destroy();
-
-        $this->_started = FALSE;
-    }   
-
+    }
+    
     public function isSafe() {
         if ( ! isset($_SESSION['IPADDRESS']) || ! isset($_SESSION['USERAGENT']))
             return FALSE;
@@ -117,6 +169,7 @@ class Session extends Component {
         $remoteIpHeader = isset($_SERVER['HTTP_X_FORWARDED_FOR'])
             ? $_SERVER['HTTP_X_FORWARDED_FOR'] 
             : $_SERVER['REMOTE_ADDR'];
+
 
         $remoteIpSegment = substr($remoteIpHeader, 0, 7);
 
@@ -136,8 +189,10 @@ class Session extends Component {
             return;
         }
 
-        $_SESSION['OBSOLETE'] = TRUE;
-        $_SESSION['EXPIRES'] = time() + 10;
+        $this->set(array(
+            'OBSOLETE' => TRUE,
+            'EXPIRES' => time() + 10
+        ));
 
         session_regenerate_id(FALSE);
 
@@ -147,10 +202,18 @@ class Session extends Component {
         session_id($id);
         session_start();
 
+        if (isset($_SESSION['STARTDATE'], $_SESSION['STOPDATE'])) {
+            $current = time();
+            $elapsed = $current - $_SESSION['STARTDATE'];
+
+            $this->set(array(
+                'STARTDATE' => $current,
+                'STOPDATE' => $_SESSION['STOPDATE'] + $elapsed
+            ));
+        }
+
         unset($_SESSION['OBSOLETE']);
         unset($_SESSION['EXPIRES']);
-
-        $this->_started = TRUE;
     }
 
     public function isValid() {

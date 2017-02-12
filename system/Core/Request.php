@@ -3,10 +3,44 @@ namespace Sys\Core;
 
 use Sys\Helper\Text;
 
-class Request extends Component {
+class Request extends \Sys\Core\Component {
 
     protected $_raw;
     protected $_put;
+
+    public function parse() {
+        $input = $this->getInput();
+
+        if ( ! empty($input)) {
+            if ($this->isJson()) {
+                try {
+                    $input = json_decode($input, TRUE);
+                } catch(\Exception $e){}
+            }
+
+            $post = $this->isPost() || $this->isPut() || $this->isDelete();
+
+            if (is_array($input) && $post) {
+                $put = $this->isPut();
+
+                if ($put) {
+                    $this->_put = array();
+                }
+
+                foreach($input as $key => $val) {
+                    if ( ! isset($_REQUEST[$key])) {
+                        $_REQUEST[$key] = $val;
+                    }
+
+                    $_POST[$key] = $val;
+
+                    if ($put) {
+                        $this->_put[$key] = $val;
+                    }
+                }    
+            }
+        }
+    }
 
     public function getHeaders() {
         $headers = array();
@@ -26,15 +60,20 @@ class Request extends Component {
         return $headers;
     }
 
-    public function getHeader($header) {
-        $name = strtoupper(strtr($header, '-', '_'));
+    public function hasHeader($header) {
+        $header = strtoupper(strtr($header, '-', '_'));
+        return isset($_SERVER[$header]) || isset($_SERVER['HTTP_'.$header]);
+    }
 
-        if (isset($_SERVER[$name])) {
-            return $_SERVER[$name];
+    public function getHeader($header) {
+        $header = strtoupper(strtr($header, '-', '_'));
+
+        if (isset($_SERVER[$header])) {
+            return $_SERVER[$header];
         }
 
-        if (isset($_SERVER['HTTP_'.$name])) {
-            return $_SERVER['HTTP_'.$name];
+        if (isset($_SERVER['HTTP_'.$header])) {
+            return $_SERVER['HTTP_'.$header];
         }
 
         return '';
@@ -101,8 +140,13 @@ class Request extends Component {
         return isset($_REQUEST[$name]);
     }
 
+    public function hasParam($name) {
+        return isset($_GET[$name]);
+    }
+
     public function hasPost($name) {
-        return isset($_POST[$name]);
+        $post = $this->getPost();
+        return isset($post[$name]);
     }
 
     public function hasPut($name) {
@@ -137,8 +181,16 @@ class Request extends Component {
         );
     }
 
+    public function isSoap() {
+
+    }
+
+    public function isJson() {
+        return $this->getPreferredType() == 'application/json';
+    }
+
     public function isSecure() {
-        return $this->getService('uri')->isSecure();
+        return $this->getUrl()->isSecure();
     }
 
     public function get($name = NULL, $sanitize = TRUE) {
@@ -156,13 +208,13 @@ class Request extends Component {
     public function getPut($name = NULL, $sanitize = TRUE) {
         if ( ! is_array($this->_put)) {
             $put = array();
-            parse_str($this->getRaw(), $put);
+            parse_str($this->getInput(), $put);
             $this->_put = $this->_fetch($put, $name, $sanitize);
         }
         return $this->_put;
     }
 
-    public function getRaw() {
+    public function getInput() {
         if (empty($this->_raw)) {
             $content = file_get_contents('php://input');
             $this->_raw = $content;
@@ -170,14 +222,14 @@ class Request extends Component {
         return $this->_raw;
     }
 
-    public function getInput($name = NULL, $sanitize = TRUE) {
-        $content = $this->getRaw();
+    /*public function getInput($name = NULL, $sanitize = TRUE) {
+        $content = $this->getInput();
         if ( ! is_string($content)) {
             return array();
         }
         $input = json_decode($content, TRUE);
         return $this->_fetch($input, $name, $sanitize);
-    }
+    }*/
 
     public function hasFiles() {
         $files = $_FILES;
@@ -231,7 +283,7 @@ class Request extends Component {
             if (empty($name)) {
                 $values = $provider;
                 if ($sanitize) {
-                    $security = $this->getService('security');
+                    $security = $this->getSecurity();
                     foreach($values as $key => $val) {
                         $values[$key] = $security->sanitize($val);
                     }
@@ -239,10 +291,10 @@ class Request extends Component {
                 return $values;
             }
             
-            $value = $provider[$name];
+            $value = isset($provider[$name]) ? $provider[$name] : '';
 
             if ($sanitize) {
-                $security = $this->getService('security');
+                $security = $this->getSecurity();
                 $value = $security->sanitize($value);
             }
             
@@ -251,6 +303,105 @@ class Request extends Component {
             return $provider;
         }
         
+    }
+
+    public function getAcceptedType($supported, $default = 'text/html') {
+        $supp = array();
+
+        foreach($supported as $type) {
+            $supp[strtolower($type)] = $type;
+        }
+
+        if (empty($supp)) {
+            return $default;
+        }
+
+        $httpAccept = isset($_SERVER['HTTP_X_ACCEPT']) 
+            ? $_SERVER['HTTP_X_ACCEPT'] 
+            : (isset($_SERVER['HTTP_ACCEPT'])
+                ? $_SERVER['HTTP_ACCEPT'] 
+                : FALSE);
+
+        if ($httpAccept) {
+            $accepts = $this->sortAccept($httpAccept);
+
+            foreach($accepts as $type => $q) {
+                if (substr($type, -2) != '/*') {
+                    if (isset($supp[$type])) {
+                        return $supp[$type];
+                    }
+                    continue;
+                }
+
+                if ($type == '*/*') {
+                    return array_shift($supp);
+                }
+
+                list($general, $specific) = explode('/', $type);
+
+                $general .= '/';
+                $len = strlen($general);
+
+                foreach ($supp as $mime => $t) {
+                    if (strncasecmp($general, $mime, $len) == 0) {
+                        return $t;
+                    }
+                }
+            }
+        }
+
+        return $default;
+    }
+
+    public function getPreferredType() {
+        $preferred = array(
+            'text/html',
+            'text/plain',
+            'application/json',
+            'application/xml',
+            'application/xhtml+xml'
+        );
+
+        return $this->getAcceptedType($preferred);
+    }
+
+    public function sortAccept($header) {
+        $matches = array(); 
+        $parts = explode(',', $header);
+        
+        foreach($parts as $option) {
+            $option = array_map('trim', explode(';', $option));
+            $l = strtolower($option[0]);
+            if (isset($option[1])) {
+                $q = (float) str_replace('q=', '', $option[1]);
+            } else {
+                $q = null;
+                if ($l == '*/*') {
+                    $q = 0.01;
+                } elseif (substr($l, -1) == '*') {
+                    $q = 0.02;
+                }
+            }
+            $matches[$l] = isset($q) ? $q : 1000 - count($matches);
+        }
+
+        arsort($matches, SORT_NUMERIC);
+        return $matches;
+    }
+
+    public function getPreferredHandler() {
+        $method = $this->getMethod();
+        switch($method) {
+            case 'GET':
+                return 'find';
+            case 'POST':
+                return 'create';
+            case 'PUT':
+                return 'update';
+            case 'DELETE':
+                return 'delete';
+        }
+        return strtolower($method);
     }
 
 }
